@@ -1,15 +1,20 @@
- ---
-- name: Install and Configure NTP
- hosts: all
- vars:
-   ntp_server: [pool.ntp.org, south-america.pool.ntp.org]
- tasks:
- - name: Install NTP
-   apt: name=ntp update_cache=yes
- - name: Copy the ntp.conf template file
-   template: src=ntp.conf.j2 dest=/etc/ntp.conf
-   notify: 
-     - restart ntp
- handlers:
- - name: restart ntp
-   service: name=ntp state=restarted
+---
+- hosts: all
+  tasks:
+  - name: make sure chronyd is installed
+    yum:
+     name: chrony
+     state: latest
+     update_cache: yes
+
+  - name: deploy chrony.conf template
+    template:
+     owner: root
+     group: root
+     mode: 0644
+     backup: yes
+
+  - name: Restart chronyd
+    service:
+      name: chronyd
+      state: restarted
