@@ -6,10 +6,11 @@
      name: chrony
      state: latest
      update_cache: yes
-
-  
-
   - name: Restart chronyd
     service:
       name: chronyd
       state: restarted
+      owner: root
+     group: root
+     mode: 0644
+     backup: yes
