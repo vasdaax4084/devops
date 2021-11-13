@@ -1,15 +1,41 @@
 ---
 - hosts: all
-  name: Install the apache web service
-  become: yes
-
   tasks:
-    - name: install apache
-      package:
-        name: httpd
-        state: present
+  - name: allow ntp through firewall
+    shell: firewall-cmd --add-service=ntp --permanent
 
-    - name: start httpd
-      service:
-        name: httpd
-        state: started
+  - name: firewall reload
+    shell: firewall-cmd --reload
+
+  - name: Make sure Chrony is started up
+    service: name=chronyd state=started enabled=yes
+    tags: chrony
+
+    #- hosts: servers
+    # tasks:
+  - name: set timezone
+    shell: timedatectl set-timezone America/New_York
+
+  - name: Install NTP
+    yum: name=ntp state=installed
+    tags: ntp
+
+  - name: Make sure NTP is stopped
+    service: name=ntpd state=stopped enabled=yes
+    tags: ntp
+
+  - name: Sync time initialy
+    shell: ntpdate 0.centos.pool.ntp.org
+    tags: ntp
+
+  - name: Make sure NTP is started up
+    service: name=ntpd state=restarted enabled=yes
+    tags: ntp
+
+  - name: Sync hwclock
+    shell: hwclock -w
+    tags: ntp
+
+  handlers:
+  - name: restart ntpd
+    service: name=ntpd state=restarted
