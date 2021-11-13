@@ -1,22 +1,15 @@
 ---
-- hosts: all
+- hosts: web
+  name: Install the apache web service
+  become: yes
+
   tasks:
-  - name: make sure chronyd is installed
-    yum:
-     name: chrony
-     state: latest
-     update_cache: yes
+    - name: install apache
+      package:
+        name: httpd
+        state: present
 
-  - name: deploy chrony.conf template
-    template:
-     src: /some/full/path/chrony.conf.j2
-     dest: /etc/chrony.conf
-     owner: root
-     group: root
-     mode: 0644
-     backup: yes
-
-  - name: Restart chronyd
-    service:
-      name: chronyd
-      state: restarted
+    - name: start httpd
+      service:
+        name: httpd
+        state: started
