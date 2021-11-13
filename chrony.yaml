@@ -1,5 +1,5 @@
 ---
-- hosts: All
+- hosts: all
   name: Install the apache web service
   become: yes
 
