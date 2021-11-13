@@ -1,10 +1,46 @@
-tasks:
- - name: install apache
-   package:
-     name: httpd
-     state: present
+hosts: manager
+  tasks:
+  - name: allow ntp through firewall
+    shell: firewall-cmd --add-service=ntp --permanent
 
- - name: start httpd
-   service:
-     name: httpd
-     state: started
+  - name: firewall reload
+    shell: firewall-cmd --reload
+
+  - name: Make sure Chrony is started up
+    service: name=chronyd state=running enabled=yes
+    tags: chrony
+ 
+- hosts: servers
+  tasks:
+  - name: set timezone
+    shell: timedatectl set-timezone Europe/Berlin
+
+  - name: Install NTP
+    yum: name=ntp state=installed 
+    tags: ntp
+ 
+  - name: Copy over the NTP configuration
+    template: src=./templates/ntp.conf dest=/etc/ntp.conf
+    notify:
+    - restart ntpd
+    tags: ntp
+ 
+  - name: Make sure NTP is stopped
+    service: name=ntpd state=stopped enabled=yes
+    tags: ntp
+ 
+  - name: Sync time initialy
+    shell: ntpdate 172.16.20.1
+    tags: ntp
+
+  - name: Make sure NTP is started up
+    service: name=ntpd state=running enabled=yes
+    tags: ntp
+
+  - name: Sync hwclock
+    shell: hwclock -w
+    tags: ntp
+
+  handlers:
+  - name: restart ntpd
+    service: name=ntpd state=restarted
