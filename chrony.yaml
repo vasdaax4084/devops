@@ -1,26 +1,14 @@
 ---
 - hosts: all
-    
-  - name: Install NTP
-    yum: name=ntp state=installed
-    tags: ntp
+  tasks:
+  - name: make sure chronyd is installed
+    yum:
+     name: chrony
+     state: latest
+     update_cache: yes
 
-  - name: Make sure NTP is stopped
-    service: name=ntpd state=stopped enabled=yes
-    tags: ntp
-
-  - name: Sync time initialy
-    shell: ntpdate 0.centos.pool.ntp.org
-    tags: ntp
-
-  - name: Make sure NTP is started up
-    service: name=ntpd state=restarted enabled=yes
-    tags: ntp
-
-  - name: Sync hwclock
-    shell: hwclock -w
-    tags: ntp
-
-  handlers:
-  - name: restart ntpd
-    service: name=ntpd state=restarted
+  
+  - name: Restart chronyd
+    service:
+      name: chronyd
+      state: restarted
