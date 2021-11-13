@@ -2,19 +2,14 @@
 - hosts: All
   name: Install the apache web service
   become: yes
-tasks:
- - name: install apache
-   package:
-     name: httpd
-     state: present
 
- - name: start httpd
-   service:
-     name: httpd
-     state: started
-package:
-  name: httpd
-  state: present
-service:
-  name: httpd
-  state: started
+  tasks:
+    - name: install apache
+      package:
+        name: httpd
+        state: present
+
+    - name: start httpd
+      service:
+        name: httpd
+        state: started
