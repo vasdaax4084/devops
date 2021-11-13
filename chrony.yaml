@@ -10,7 +10,6 @@
     service:
       name: chronyd
       state: restarted
-      owner: root
-     group: root
+      
      
      
