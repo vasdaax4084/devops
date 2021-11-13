@@ -1,14 +1,6 @@
 ---
 - hosts: all
-    - name: Make sure Chrony is started up
-    service: name=chronyd state=started enabled=yes
-    tags: chrony
-
-    #- hosts: servers
-    # tasks:
-  - name: set timezone
-    shell: timedatectl set-timezone America/New_York
-
+    
   - name: Install NTP
     yum: name=ntp state=installed
     tags: ntp
